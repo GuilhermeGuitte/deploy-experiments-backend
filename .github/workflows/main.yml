@@ -13,7 +13,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      # https://dev.to/mpocock1/how-to-cache-nodemodules-in-github-actions-with-yarn-24eh
+      - name: Cache dependencies over yarn if nothing changes.
+        uses: actions/cache@v2.1.4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn
 
       - name: Run unit test
